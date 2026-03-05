@@ -15,6 +15,7 @@
     <aside>
       <h2>Menú</h2>
       <ul>
+        <li>Inicio</li>
         <li>Juegos al 100%</li>
         <li>Por completar</li>
       </ul>
@@ -22,7 +23,13 @@
 
     <div class="contenido">
       <section class="juegos-al-100">
-      <h3>Lista de juegos al 100%</h3>
+                 <form id="form-juego">
+  <input type="text" id="input-juego" placeholder="Añadir juego" required>
+  <button type="submit">Añadir</button>
+</form>
+<section id="lista-juegos">
+</section>
+      <h3>Lista de juegos al 100%</h3> 
 
       <div class="juego">
         <div class="platino">
@@ -200,10 +207,11 @@
             <h4>Elden Ring</h4>
             <p>Juego de rol de acción (action RPG) y aventura en tercera persona desarrollado por FromSoftware con 43 trofeos.</p>
             <span class="badge baja">15%</span>
+          </div>
         </div>
       </section>
     </div> 
   </main>
+  <script src="app.js"></script>
 </body>
-
 </html>
