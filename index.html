@@ -5,7 +5,6 @@
   <title>Web app</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-</head>
 <body>
 
   <header>
@@ -16,6 +15,7 @@
     <aside>
       <h2>Menú</h2>
       <ul>
+        <li>Inicio</li>
         <li>Juegos al 100%</li>
         <li>Por completar</li>
       </ul>
@@ -23,7 +23,13 @@
 
     <div class="contenido">
       <section class="juegos-al-100">
-      <h3>Lista de juegos al 100%</h3>
+                 <form id="form-juego">
+  <input type="text" id="input-juego" placeholder="Añadir juego" required>
+  <button type="submit">Añadir</button>
+</form>
+<section id="lista-juegos">
+</section>
+      <h3>Lista de juegos al 100%</h3> 
 
       <div class="juego">
         <div class="platino">
@@ -206,6 +212,6 @@
       </section>
     </div> 
   </main>
+  <script src="app.js"></script>
 </body>
-</html>
 </html>
