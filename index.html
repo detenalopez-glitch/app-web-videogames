@@ -6,210 +6,57 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
+  <button id="darkModeToggle" class="bg-blue-500 hover:bg-blue-600 transition text-white px-4 py-2 rounded">
+    Modo Oscuro
+  </button>
   <header>
-    <h1>Web app</h1>
+    <meta charset="UTF-8">
+    <header class="bg-gray-800 text-white p-4">
+  <h1 class="text-2xl font-bold">Web app</h1>
+</header>
+  <style type="text/tailwindcss">
+@layer components {
+  .platino {
+    @apply p-4;
+  }
+}
+</style>
+    <script src="https://cdn.tailwindcss.com"></script>
   </header>
-
   <main>
     <aside>
-      <h2>Menú</h2>
+      <h2 class="flex-1 p-3">Menú</h2>
       <ul>
-        <li>Inicio</li>
-        <li>Juegos al 100%</li>
-        <li>Por completar</li>
+        <li class="flex-1 p-3">Inicio</li>
+        <li class="flex-1 p-3">Juegos al 100%</li>
+        <li class="flex-1 p-3">Por completar</li>
       </ul>
     </aside>
 
     <div class="contenido">
       <section class="juegos-al-100">
                  <form id="form-juego">
-  <input type="text" id="input-juego" placeholder="Añadir juego" required>
+  <input type="text" id="input-juego" placeholder="Nombre del juego" required
+class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+>
+  <input type="text" id="input-descripcion" placeholder="Descripción" 
+class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+>
+  <input type="number" id="input-porcentaje" placeholder="Porcentaje" min="0" max="100"
+class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+>
   <button type="submit">Añadir</button>
+  
 </form>
-<section id="lista-juegos">
+      <h3>Lista de juegos al 100%</h3>
+<section id="lista-juegos-100">
 </section>
-      <h3>Lista de juegos al 100%</h3> 
 
-      <div class="juego">
-        <div class="platino">
-          <h4>Far Cry Primal</h4>
-          <p>Juego de acción‑aventura desarrollado por Ubisoft con 51 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
+      <h3>Lista de juegos por completar</h3>
+<section id="lista-juegos-incompletos">
+</section> 
 
-      <div class="juego">
-        <div class="platino">
-          <h4>Marvel Spiderman</h4>
-          <p>Juego de acción‑aventura desarrollado por Insomniac Games con 51 trofeos (sin contar DLC).</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Astro Playroom</h4>
-          <p>Juego de plataformas 3D desarrollado por PlayStation con 43 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Marvel Spiderman: Miles Morales</h4>
-          <p>Juego de acción‑aventura desarrollado por Insomniac Games con 50 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Demon Slayer: Kimetsu no Yaiba – The Hinokami Chronicles</h4>
-          <p>Juego de lucha 3D (arena fighter) desarrollado por CyberConnect2 con 47 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Bob Esponja: Battle for Bikini Bottom – Rehydrated</h4>
-          <p>Juego de plataformas 3D desarrollado por Purple Lamp Studios con 33 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Nickelodeon All-Star Brawl</h4>
-          <p>Juego de lucha de plataformas (platform fighter) desarrollado por Ludosity y Fair Play Labs con 25 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Control</h4>
-          <p>Juego de acción‑aventura y disparos en tercera persona desarrollado por Remedy Entertainment con 47 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Stray</h4>
-          <p>Juego de aventuras y plataformas desarrollado por BlueTwelve Studio con 25 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Deliver Us The Moon</h4>
-          <p>Juego de aventura y rompecabezas desarrollado por KeokeN Interactive con 33 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Dragon Ball Z: Kakarot</h4>
-          <p>Juego de RPG de acción (Action RPG) con elementos de aventura y lucha en 3D desarrollado por CyberConnect2 con 42 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Persona 5 Royal</h4>
-          <p>Juego JRPG desarrollado por Atlus con 53 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>We Were Here Expeditions: The FriendShip</h4>
-          <p>Juego de puzles y aventuras cooperativas desarrollado por Total Mayhem Games con 12 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Dragon Ball Xenoverse 2</h4>
-          <p>Juego de lucha y acción con toques RPG y MMO desarrollado por Dimps con 50 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Marvel's Spider-Man 2</h4>
-          <p>Juego de acción y aventura de mundo abierto desarrollado por Insomniac Games con 42 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Hora de Aventuras: Finn y Jake, Investigadores</h4>
-          <p>Juego de aventura gráfica y acción en 3D desarrollado por Vicious Cycle Software con 25 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Cat Quest</h4>
-          <p>Juego de acción y rol desarrollado por The Gentlebros con 23 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Dragon Ball: Sparking! Zero</h4>
-          <p>Juego de lucha 3D de alta velocidad y acción desarrollado por Spike Chunsoft y Bandai Namco con 50 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Zenless Zone Zero</h4>
-          <p>Juego de rol de acción (ARPG) de fantasía urbana desarrollado por HoYoverse con 44 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
-
-      <div class="juego">
-        <div class="platino">
-          <h4>Hora de Aventuras: Piratas del Enchiridion</h4>
-          <p>Juego de rol (RPG) y aventura de acción en tercera persona y mundo abierto desarrollado por Climax Studios con 36 trofeos.</p>
-          <span class="badge alta">100%</span>
-        </div>
-      </div>
     </section>
-
-      <section class="juegos-por-completar">
-        <h3>Lista de juegos por completar</h3>
-        <div class="juego">
-          <div class="Incompleto">
-            <h4>Horizon Forbidden West</h4>
-            <p>Juego de acción‑aventura y RPG de mundo abierto desarrollado por Guerrilla Games con 51 trofeos.</p>
-            <span class="badge media">50%</span>
-          </div>
-        </div>
-          
-        <div class="juego">
-          <div class="Incompleto">
-            <h4>Elden Ring</h4>
-            <p>Juego de rol de acción (action RPG) y aventura en tercera persona desarrollado por FromSoftware con 43 trofeos.</p>
-            <span class="badge baja">15%</span>
-          </div>
-        </div>
-      </section>
     </div> 
   </main>
   <script src="app.js"></script>

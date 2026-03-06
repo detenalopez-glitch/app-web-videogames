@@ -1,12 +1,19 @@
 :root {
-  --color-fondo: #1f1c1c;
-  --color-principal: #4caf50;
-  --color-secundario: #223156;
-  --color-texto: #fbf3f3;
+  --color-fondo: #201d1d;
+  --color-principal: #1b7820;
+  --color-secundario: #1a1818;
+  --color-texto: #0f0e0e;
   --espacio: 1rem;
   --radio-borde: 8px;
   --transicion: 0.3s;
   --fuente-principal: Arial, sans-serif;
+}
+
+html.dark {
+  --color-fondo: #ffffff;
+  --color-principal: #4caf50;
+  --color-secundario: #383eb0;
+  --color-texto: #110f0f;
 }
 
 * {
@@ -60,14 +67,14 @@ aside {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgb(44, 40, 40);
+  background-color: var(--color-secundario);
   padding: var(--espacio);
   border-radius: var(--radio-borde);
   transition: background-color var(--transicion), transform var(--transicion);
 }
 
 .juego:hover {
-  background-color: #101112;
+  background-color: #333333;
   transform: translateY(-3px);
 }
 
