@@ -53,29 +53,38 @@ function renderizarJuegos() {
     listaIncompletos.innerHTML = "";
 
     juegos.forEach(function(juego, index) {
-
-        let colorClass = "";
-        if (juego.porcentaje == 100) {
-            colorClass = "border-green-500 bg-green-50";
-        } else if (juego.porcentaje >= 50) {
-            colorClass = "border-orange-500 bg-orange-50";
-        } else {
-            colorClass = "border-red-500 bg-red-50";
-        }
+            let borderClass = "";
+            let progressColor = "";
+            const porcentaje = parseInt(juego.porcentaje);
+            if (porcentaje === 100) {
+                borderClass = "border-green-500";
+                progressColor = "bg-green-500";
+            } else if (porcentaje >= 50) {
+                borderClass = "border-orange-500";
+                progressColor = "bg-orange-500";
+            } else {
+                borderClass = "border-red-500";
+                progressColor = "bg-red-500";
+            }
 
         const div = document.createElement("div");
-        div.classList.add("juego");
+            div.className = `relative rounded-xl border-4 ${borderClass} bg-gray-800 bg-opacity-90 p-8 mb-6 shadow-lg flex flex-col`;
 
         div.innerHTML = `
-            <div class="platino border-4 ${colorClass}">
-                <h4>${juego.nombre}</h4>
-                <p>${juego.descripcion}</p>
-                <span class="badge alta">${juego.porcentaje}%</span>
+            <div class="flex flex-col gap-2">
+                    <h4 class="text-lg font-bold mb-1">${juego.nombre}</h4>
+                    <p class="text-base mb-3">${juego.descripcion}</p>
+                    <div class="w-full bg-gray-700 rounded-full h-6 mt-2 mb-2 overflow-hidden">
+                        <div class="h-6 rounded-full flex items-center justify-center font-bold text-white text-sm transition-all duration-500 ${progressColor}"
+                            style="width: ${porcentaje}%; min-width: 2.5rem;">
+                            ${porcentaje}%
+                        </div>
+                    </div>
             </div>
-            <button onclick="confirmarEliminar(` + index + `)">Eliminar</button>
+                <button onclick="confirmarEliminar(${index})" class="absolute top-3 right-3 bg-red-700 hover:bg-red-800 text-white text-xs px-3 py-1 rounded transition">Eliminar</button>
         `;
 
-        if (juego.porcentaje == 100) {
+        if (parseInt(juego.porcentaje) === 100) {
             lista100.appendChild(div);
         } else {
             listaIncompletos.appendChild(div);
@@ -84,16 +93,13 @@ function renderizarJuegos() {
 }
 
 function confirmarEliminar(index) {
-    console.log("Index recibido:", index);
     if (confirm("¿Estás seguro de que quieres eliminar este juego?")) {
         eliminarJuego(index);
     }
 }
-// Función para eliminar un juego
+// Eliminar juego
 function eliminarJuego(index) {
-    console.log("Eliminando index", index);
     juegos.splice(index, 1);
-    console.log("Juegos restantes:", juegos);
     guardarEnLocalStorage();
     renderizarJuegos();
 }
@@ -105,16 +111,30 @@ function guardarEnLocalStorage() {
 window.addEventListener("DOMContentLoaded", function() {
 
     const datosGuardados = localStorage.getItem("juegos");
-
     if (datosGuardados) {
         juegos = JSON.parse(datosGuardados);
-        renderizarJuegos();
+    } else {
+        // Juegos de prueba para ver los colores
+        juegos = [
+            { nombre: "Juego Verde", descripcion: "Completado al 100%", porcentaje: 100 },
+            { nombre: "Juego Naranja", descripcion: "Completado al 75%", porcentaje: 75 },
+            { nombre: "Juego Rojo", descripcion: "Completado al 30%", porcentaje: 30 }
+        ];
+    }
+    renderizarJuegos();
+
+    // Persistencia del modo oscuro
+    if (localStorage.getItem("modoOscuro") === "true") {
+        document.documentElement.classList.add("dark");
+    } else {
+        document.documentElement.classList.remove("dark");
     }
 
-});
-// Función para alternar el modo oscuro
-const toggle = document.getElementById("darkModeToggle");
-
-toggle.addEventListener("click", function() {
-    document.documentElement.classList.toggle("dark");
+    const botonDark = document.getElementById("darkModeToggle");
+    if (botonDark) {
+        botonDark.addEventListener("click", () => {
+            document.documentElement.classList.toggle("dark");
+            localStorage.setItem("modoOscuro", document.documentElement.classList.contains("dark"));
+        });
+    }
 });

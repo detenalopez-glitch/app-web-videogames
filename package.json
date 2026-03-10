@@ -1,0 +1,13 @@
+{
+  "name": "pagina-web-app",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build:css": "npx tailwindcss -i ./tailwind.css -o ./styles.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.0.0",
+    "postcss": "^8.0.0",
+    "autoprefixer": "^10.0.0"
+  }
+}
