@@ -1,0 +1,1 @@
+Aquí voy a documentar diferentes experimentos realizados con herramientas de inteligencia artificial durante el proyecto, incluyendo resultados, problemas encontrados y aprendizajes.

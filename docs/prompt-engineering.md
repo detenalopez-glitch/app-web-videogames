@@ -1,0 +1,1 @@
+Este documento recoge las estrategias de prompt engineering que utilizo al trabajar con herramientas de inteligencia artificial, incluyendo ejemplos de prompts efectivos y cómo mejorarlos.
