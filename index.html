@@ -5,60 +5,69 @@
   <title>Web app</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <button id="darkModeToggle" class="bg-blue-500 hover:bg-blue-600 transition text-white px-4 py-2 rounded">
-    Modo Oscuro
-  </button>
-  <header>
-    <meta charset="UTF-8">
-    <header class="bg-gray-800 text-white p-4">
-  <h1 class="text-2xl font-bold">Web app</h1>
-</header>
-  <style type="text/tailwindcss">
-@layer components {
-  .platino {
-    @apply p-4;
-  }
-}
-</style>
-    <script src="https://cdn.tailwindcss.com"></script>
+<body class="bg-gray-100 dark:bg-gray-900 text-black dark:text-white box-border font-principal m-2.5 p-1.5">
+  <button id="darkModeToggle" class="m-4 bg-blue-500 dark:bg-blue-700 hover:bg-blue-600 dark:hover:bg-blue-800 transition text-white px-4 py-2 rounded">Modo Oscuro</button>
+  <header class="bg-gray-800 dark:bg-gray-900 text-white">
+    <h1 class="text-2xl font-bold">Web app</h1>
   </header>
-  <main>
-    <aside>
-      <h2 class="flex-1 p-3">Menú</h2>
-      <ul>
-        <li class="flex-1 p-3">Inicio</li>
-        <li class="flex-1 p-3">Juegos al 100%</li>
-        <li class="flex-1 p-3">Por completar</li>
+  <main class="flex min-h-[80vh]">
+    <aside class="bg-gray-700 dark:bg-gray-800 text-white w-52 p-4">
+      <h2 class="mb-3 font-bold">Menú</h2>
+      <ul class="space-y-2">
+        <li class="p-2 hover:bg-gray-600 dark:hover:bg-gray-700 rounded cursor-pointer transition">Inicio</li>
+        <li class="p-2 hover:bg-gray-600 dark:hover:bg-gray-700 rounded cursor-pointer transition">Juegos al 100%</li>
+        <li class="p-2 hover:bg-gray-600 dark:hover:bg-gray-700 rounded cursor-pointer transition">Por completar</li>
       </ul>
     </aside>
+    <div class="contenido flex-1 p-6 flex flex-col gap-4">
+      <section class="juegos-al-100 flex flex-col gap-4">
+        <form id="form-juego" class="flex flex-wrap gap-2">
+          <input type="text" id="input-juego" placeholder="Nombre del juego" required class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700">
 
-    <div class="contenido">
-      <section class="juegos-al-100">
-                 <form id="form-juego">
-  <input type="text" id="input-juego" placeholder="Nombre del juego" required
-class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+<input
+ type="text"
+ id="input-descripcion"
+ placeholder="Descripción"
+ class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700"
+/>
+
+<input
+ type="number"
+ id="input-porcentaje"
+ placeholder="Porcentaje"
+ min="0"
+ max="100"
+ class="border p-2 rounded w-28 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700"
+/>
+
+<button
+ type="submit"
+ class="bg-green-500 dark:bg-green-700 hover:bg-green-600 dark:hover:bg-green-800 transition text-white px-4 py-2 rounded"
 >
-  <input type="text" id="input-descripcion" placeholder="Descripción" 
-class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
->
-  <input type="number" id="input-porcentaje" placeholder="Porcentaje" min="0" max="100"
-class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
->
-  <button type="submit">Añadir</button>
-  
+Añadir
+</button>
+
 </form>
-      <h3>Lista de juegos al 100%</h3>
-<section id="lista-juegos-100">
+
+
+
+<div class="bg-black bg-opacity-60 rounded-xl p-8 mb-8">
+  <h3 class="text-xl font-bold mb-4">Lista de juegos al 100%</h3>
+  <section id="lista-juegos-100" class="flex flex-col gap-2"></section>
+</div>
+
+<div class="bg-black bg-opacity-60 rounded-xl p-8 mb-8">
+  <h3 class="text-xl font-bold mb-4">Lista de juegos por completar</h3>
+  <section id="lista-juegos-incompletos" class="flex flex-col gap-2"></section>
+</div>
+
 </section>
 
-      <h3>Lista de juegos por completar</h3>
-<section id="lista-juegos-incompletos">
-</section> 
+</div>
 
-    </section>
-    </div> 
-  </main>
-  <script src="app.js"></script>
+</main>
+
+<script src="app.js"></script>
+
 </body>
 </html>
