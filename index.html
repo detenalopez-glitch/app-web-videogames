@@ -6,11 +6,13 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-black dark:text-white box-border font-principal m-2.5 p-1.5">
+  <!-- Botón para alternar el modo claro/oscuro -->
   <button id="darkModeToggle" class="m-4 bg-blue-500 dark:bg-blue-700 hover:bg-blue-600 dark:hover:bg-blue-800 transition text-white px-4 py-2 rounded">Modo Oscuro</button>
   <header class="bg-gray-800 dark:bg-gray-900 text-white">
     <h1 class="text-2xl font-bold">Web app</h1>
   </header>
   <main class="flex min-h-[80vh]">
+    <!-- Barra lateral de navegación -->
     <aside class="bg-gray-700 dark:bg-gray-800 text-white w-52 p-4">
       <h2 class="mb-3 font-bold">Menú</h2>
       <ul class="space-y-2">
@@ -20,54 +22,54 @@
       </ul>
     </aside>
     <div class="contenido flex-1 p-6 flex flex-col gap-4">
+      <!-- Sección principal de gestión de juegos -->
       <section class="juegos-al-100 flex flex-col gap-4">
+        <!-- Formulario para añadir juegos a la lista -->
         <form id="form-juego" class="flex flex-wrap gap-2">
-          <input type="text" id="input-juego" placeholder="Nombre del juego" required class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700">
+          <input
+            type="text"
+            id="input-juego"
+            placeholder="Nombre del juego"
+            required
+            class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700"
+          >
+          <input
+            type="text"
+            id="input-descripcion"
+            placeholder="Descripción"
+            class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700"
+          >
+          <input
+            type="number"
+            id="input-porcentaje"
+            placeholder="Porcentaje"
+            min="0"
+            max="100"
+            class="border p-2 rounded w-28 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700"
+          >
+          <button
+            type="submit"
+            class="bg-green-500 dark:bg-green-700 hover:bg-green-600 dark:hover:bg-green-800 transition text-white px-4 py-2 rounded"
+          >
+            Añadir
+          </button>
+        </form>
 
-<input
- type="text"
- id="input-descripcion"
- placeholder="Descripción"
- class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700"
-/>
+        <!-- Lista de juegos completados al 100% -->
+        <div class="bg-black bg-opacity-60 rounded-xl p-8 mb-8">
+          <h3 class="text-xl font-bold mb-4">Lista de juegos al 100%</h3>
+          <section id="lista-juegos-100" class="flex flex-col gap-2"></section>
+        </div>
 
-<input
- type="number"
- id="input-porcentaje"
- placeholder="Porcentaje"
- min="0"
- max="100"
- class="border p-2 rounded w-28 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700"
-/>
+        <!-- Lista de juegos aún por completar -->
+        <div class="bg-black bg-opacity-60 rounded-xl p-8 mb-8">
+          <h3 class="text-xl font-bold mb-4">Lista de juegos por completar</h3>
+          <section id="lista-juegos-incompletos" class="flex flex-col gap-2"></section>
+        </div>
+      </section>
+    </div>
+  </main>
 
-<button
- type="submit"
- class="bg-green-500 dark:bg-green-700 hover:bg-green-600 dark:hover:bg-green-800 transition text-white px-4 py-2 rounded"
->
-Añadir
-</button>
-
-</form>
-
-
-
-<div class="bg-black bg-opacity-60 rounded-xl p-8 mb-8">
-  <h3 class="text-xl font-bold mb-4">Lista de juegos al 100%</h3>
-  <section id="lista-juegos-100" class="flex flex-col gap-2"></section>
-</div>
-
-<div class="bg-black bg-opacity-60 rounded-xl p-8 mb-8">
-  <h3 class="text-xl font-bold mb-4">Lista de juegos por completar</h3>
-  <section id="lista-juegos-incompletos" class="flex flex-col gap-2"></section>
-</div>
-
-</section>
-
-</div>
-
-</main>
-
-<script src="app.js"></script>
-
+  <script src="app.js"></script>
 </body>
 </html>

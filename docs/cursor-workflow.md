@@ -1,0 +1,6 @@
+control + 
+Ctrl+Shift+P
+Me a ayudado a ver fallos que tenia en el codigo o posiblles futuros fallos como el guardado y los colores en css
+MCP:
+Para instalar el MCP en este caso github lo que hice primero es ir a la pagina web de cursor y descargarlo alli ya que tienen la opcion de hacerlo y despues abrir cursor para poner lo que haga falta. Lo siguiente que hice fue meterme en configuracion de mi github e irme a la opcion de classic token, al pinchar en esa opcionte puedes crear un token nuevo en este caso escogi classic. Despues de configurar los permisos que tendria em MCP genere el token y lo copie. cuando ya tenia el MCp por desgracia no se pudo conectar porque no se conectaba al npm asi que volvi a reacer todo pero esta vez desde la propia aplicacion de cursor y crear un custon MCP Para el codigo si utilice la IA para que me ayudara puse de nuevo el token y ya en ese momento empezo a funcionar el MCP.
+En proyectos reales en el caso del mio sirve bastante para ahorrar tiempo en procesos como los pull request y tambien pedirle que te vaya revisando el github. Para mi el MCP ayuda a automatizar tareas y hacer consultas de forma rapida y esto en un proyecto real viene muy bien y mas si es grande y tienes demasiadas cosas y al revisar a mano a parte de tarda es posible que falle en algo cosa que el MCP lo hace mas rapido y sin fallar.  

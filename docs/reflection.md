@@ -1,0 +1,1 @@
+En este documento incluiré una reflexión personal sobre el uso de herramientas de inteligencia artificial en el desarrollo del proyecto y cómo han influido en el proceso de aprendizaje.
