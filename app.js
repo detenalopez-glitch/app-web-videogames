@@ -87,10 +87,20 @@ function crearTarjetaJuego(juego, porcentaje, estilos, onEliminarClick) {
                 </div>
             </div>
         </div>
+        <button class="btn-editar absolute top-3 left-3 bg-blue-700 hover:bg-blue-800 text-white text-xs px-3 py-1 rounded transition">
+            Editar
+        </button>
         <button class="btn-eliminar absolute top-3 right-3 bg-red-700 hover:bg-red-800 text-white text-xs px-3 py-1 rounded transition">
             Eliminar
         </button>
     `;
+    // Botón editar
+    const botonEditar = tarjeta.querySelector(".btn-editar");
+    if (botonEditar) {
+        botonEditar.addEventListener("click", function() {
+            mostrarFormularioEdicion(juego);
+        });
+    }
 
     const botonEliminar = tarjeta.querySelector(".btn-eliminar");
     if (botonEliminar) {
@@ -191,12 +201,85 @@ function renderizarJuegos() {
                 confirmarEliminar(index);
             }
         );
+        // Guardar el índice en el dataset para edición
+        tarjetaJuego.dataset.index = index;
 
         if (porcentaje === 100) {
             listaJuegosCompletos.appendChild(tarjetaJuego);
         } else {
             listaJuegosIncompletos.appendChild(tarjetaJuego);
         }
+    });
+}
+
+// Formulario flotante para editar juego
+function mostrarFormularioEdicion(juego) {
+    // Crear fondo modal
+    const fondo = document.createElement("div");
+    fondo.style.position = "fixed";
+    fondo.style.top = "0";
+    fondo.style.left = "0";
+    fondo.style.width = "100vw";
+    fondo.style.height = "100vh";
+    fondo.style.background = "rgba(0,0,0,0.5)";
+    fondo.style.zIndex = "1000";
+
+    // Crear formulario
+    const form = document.createElement("form");
+    form.className = "bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col gap-4 max-w-md mx-auto mt-32";
+    form.innerHTML = `
+        <h3 class="text-lg font-bold mb-2">Editar juego</h3>
+        <input type="text" name="nombre" value="${juego.nombre}" class="border p-2 rounded" required>
+        <input type="text" name="descripcion" value="${juego.descripcion}" class="border p-2 rounded" required>
+        <input type="number" name="porcentaje" value="${juego.porcentaje}" min="0" max="100" class="border p-2 rounded w-28" required>
+        <div class="flex gap-2">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Guardar</button>
+            <button type="button" class="bg-gray-400 hover:bg-gray-500 text-black px-4 py-2 rounded btn-cerrar">Cancelar</button>
+        </div>
+    `;
+
+    fondo.appendChild(form);
+    document.body.appendChild(fondo);
+
+    // Cerrar modal
+    form.querySelector(".btn-cerrar").addEventListener("click", function() {
+        document.body.removeChild(fondo);
+    });
+
+    // Guardar cambios
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const nombre = form.nombre.value.trim();
+        const descripcion = form.descripcion.value.trim();
+        const porcentaje = normalizarPorcentaje(form.porcentaje.value);
+
+        if (!nombre) {
+            alert("El nombre es obligatorio.");
+            return;
+        }
+        if (descripcion.length < 3) {
+            alert("La descripción debe tener al menos 3 caracteres.");
+            return;
+        }
+        if (porcentaje < 0 || porcentaje > 100) {
+            alert("El porcentaje debe estar entre 0 y 100.");
+            return;
+        }
+
+        // Evitar duplicados por nombre (excepto el mismo juego)
+        const index = juegosDelUsuario.findIndex(j => j.nombre === juego.nombre && j.descripcion === juego.descripcion && j.porcentaje === juego.porcentaje);
+        if (index !== -1) {
+            // Verificar si el nuevo nombre ya existe en otro juego
+            const nombreDuplicado = juegosDelUsuario.some((j, i) => i !== index && j.nombre.toLowerCase() === nombre.toLowerCase());
+            if (nombreDuplicado) {
+                alert("Ya tienes un juego con ese nombre.");
+                return;
+            }
+            juegosDelUsuario[index] = { nombre, descripcion, porcentaje };
+            guardarEnLocalStorage();
+            renderizarJuegos();
+        }
+        document.body.removeChild(fondo);
     });
 }
 
