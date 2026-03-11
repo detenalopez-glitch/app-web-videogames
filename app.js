@@ -425,6 +425,32 @@ function guardarEnLocalStorage() {
 }
 //cargar datos al iniciar la página
 window.addEventListener("DOMContentLoaded", function() {
+        // Sidebar menú
+        const sidebar = document.getElementById("sidebarMenu");
+        const menuToggle = document.getElementById("menuToggle");
+        const menuClose = document.getElementById("menuClose");
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener("click", () => {
+                sidebar.style.transform = "translateX(0)";
+            });
+        }
+        if (menuClose && sidebar) {
+            menuClose.addEventListener("click", () => {
+                sidebar.style.transform = "translateX(-100%)";
+            });
+        }
+        // Opciones de menú (puedes agregar navegación real aquí)
+        const menuInicio = document.getElementById("menuInicio");
+        const menuJuegos100 = document.getElementById("menuJuegos100");
+        const menuPorCompletar = document.getElementById("menuPorCompletar");
+        [menuInicio, menuJuegos100, menuPorCompletar].forEach(item => {
+            if (item) {
+                item.addEventListener("click", () => {
+                    sidebar.style.transform = "translateX(-100%)";
+                    // Aquí puedes agregar lógica para mostrar la sección correspondiente
+                });
+            }
+        });
     // Filtros de estado
     const radiosFiltro = [
         document.getElementById("filtro-todos"),
