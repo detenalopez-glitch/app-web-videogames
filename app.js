@@ -53,15 +53,71 @@ function obtenerEstilosPorcentaje(porcentaje) {
 function obtenerUsuario() {
     let usuario = localStorage.getItem("usuario");
     if (!usuario) {
-        usuario = prompt("Ingresa tu nombre de usuario:");
-        if (usuario) {
+        mostrarPopupUsuario(function(nombreUsuario) {
+            usuario = nombreUsuario || "anonimo";
             localStorage.setItem("usuario", usuario);
-        } else {
-            usuario = "anonimo";
-        }
+            usuarioActual = usuario;
+            renderizarJuegos();
+        });
+        return "anonimo";
     }
     usuarioActual = usuario;
     return usuario;
+
+// Popup para pedir usuario
+function mostrarPopupUsuario(callback) {
+    const fondo = document.createElement("div");
+    fondo.style.position = "fixed";
+    fondo.style.top = "0";
+    fondo.style.left = "0";
+    fondo.style.width = "100vw";
+    fondo.style.height = "100vh";
+    fondo.style.background = "rgba(80,80,80,0.5)";
+    fondo.style.zIndex = "1000";
+
+    const form = document.createElement("form");
+    form.className = "popup-centro bg-gray-200 dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col gap-4";
+    form.style.position = "absolute";
+    form.style.top = "50%";
+    form.style.left = "50%";
+    form.style.transform = "translate(-50%, -50%)";
+    form.innerHTML = `
+        <h3 class="text-lg font-bold mb-2">Ingresa tu nombre de usuario</h3>
+        <input type="text" name="usuario" class="border p-2 rounded" required autofocus>
+        <div class="flex gap-2">
+            <button type="submit" class="btn-popup">Aceptar</button>
+            <button type="button" class="btn-popup btn-cerrar">Cancelar</button>
+        </div>
+    `;
+    fondo.appendChild(form);
+    document.body.appendChild(fondo);
+    // Estilos botones
+    fondo.querySelectorAll('.btn-popup').forEach(btn => {
+        btn.style.border = '2px solid #8B5CF6'; // morado
+        btn.style.background = 'transparent';
+        btn.style.color = '#fff';
+        btn.style.padding = '0.5rem 1.5rem';
+        btn.style.borderRadius = '0.5rem';
+        btn.style.fontWeight = 'bold';
+        btn.style.transition = 'background 0.2s';
+        btn.addEventListener('mouseover', () => {
+            btn.style.background = '#8B5CF6';
+        });
+        btn.addEventListener('mouseout', () => {
+            btn.style.background = 'transparent';
+        });
+    });
+    form.querySelector(".btn-cerrar").addEventListener("click", function() {
+        document.body.removeChild(fondo);
+        callback("anonimo");
+    });
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const nombre = form.usuario.value.trim();
+        document.body.removeChild(fondo);
+        callback(nombre);
+    });
+}
 }
 
 /**
@@ -294,9 +350,63 @@ function mostrarFormularioEdicion(juego) {
  * @param {number} index - Índice del juego en el arreglo `juegosDelUsuario`.
  */
 function confirmarEliminar(index) {
-    if (confirm("¿Estás seguro de que quieres eliminar este juego?")) {
-        eliminarJuego(index);
-    }
+    mostrarPopupEliminar(function(confirmado) {
+        if (confirmado) {
+            eliminarJuego(index);
+        }
+    });
+
+// Popup para confirmar eliminación
+function mostrarPopupEliminar(callback) {
+    const fondo = document.createElement("div");
+    fondo.style.position = "fixed";
+    fondo.style.top = "0";
+    fondo.style.left = "0";
+    fondo.style.width = "100vw";
+    fondo.style.height = "100vh";
+    fondo.style.background = "rgba(80,80,80,0.5)";
+    fondo.style.zIndex = "1000";
+
+    const modal = document.createElement("div");
+    modal.className = "popup-centro bg-gray-200 dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col gap-4";
+    modal.style.position = "absolute";
+    modal.style.top = "50%";
+    modal.style.left = "50%";
+    modal.style.transform = "translate(-50%, -50%)";
+    modal.innerHTML = `
+        <h3 class="text-lg font-bold mb-2">¿Seguro que quieres eliminar este juego?</h3>
+        <div class="flex gap-2">
+            <button class="btn-popup btn-si">Sí</button>
+            <button class="btn-popup btn-no">No</button>
+        </div>
+    `;
+    fondo.appendChild(modal);
+    document.body.appendChild(fondo);
+    // Estilos botones
+    fondo.querySelectorAll('.btn-popup').forEach(btn => {
+        btn.style.border = '2px solid #8B5CF6'; // morado
+        btn.style.background = 'transparent';
+        btn.style.color = '#fff';
+        btn.style.padding = '0.5rem 1.5rem';
+        btn.style.borderRadius = '0.5rem';
+        btn.style.fontWeight = 'bold';
+        btn.style.transition = 'background 0.2s';
+        btn.addEventListener('mouseover', () => {
+            btn.style.background = '#8B5CF6';
+        });
+        btn.addEventListener('mouseout', () => {
+            btn.style.background = 'transparent';
+        });
+    });
+    modal.querySelector(".btn-si").addEventListener("click", function() {
+        document.body.removeChild(fondo);
+        callback(true);
+    });
+    modal.querySelector(".btn-no").addEventListener("click", function() {
+        document.body.removeChild(fondo);
+        callback(false);
+    });
+}
 }
 /**
  * Elimina un juego por índice y actualiza almacenamiento y renderizado.
