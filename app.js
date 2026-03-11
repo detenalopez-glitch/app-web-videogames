@@ -7,6 +7,8 @@ const listaJuegosIncompletos = document.getElementById("lista-juegos-incompletos
 
 let juegosDelUsuario = [];
 let usuarioActual = "";
+// Estado del filtro
+let filtroEstado = "todos";
 
 /**
  * Normaliza un valor de porcentaje a un número entre 0 y 100.
@@ -192,7 +194,13 @@ function renderizarJuegos() {
     juegosDelUsuario.forEach(function(juego, index) {
         const porcentaje = normalizarPorcentaje(juego.porcentaje);
         const estilos = obtenerEstilosPorcentaje(porcentaje);
-
+        // Filtrado
+        if (
+            filtroEstado === "completados" && porcentaje !== 100
+            || filtroEstado === "incompletos" && porcentaje === 100
+        ) {
+            return;
+        }
         const tarjetaJuego = crearTarjetaJuego(
             juego,
             porcentaje,
@@ -201,9 +209,7 @@ function renderizarJuegos() {
                 confirmarEliminar(index);
             }
         );
-        // Guardar el índice en el dataset para edición
         tarjetaJuego.dataset.index = index;
-
         if (porcentaje === 100) {
             listaJuegosCompletos.appendChild(tarjetaJuego);
         } else {
@@ -309,6 +315,20 @@ function guardarEnLocalStorage() {
 }
 //cargar datos al iniciar la página
 window.addEventListener("DOMContentLoaded", function() {
+    // Filtros de estado
+    const radiosFiltro = [
+        document.getElementById("filtro-todos"),
+        document.getElementById("filtro-completados"),
+        document.getElementById("filtro-incompletos")
+    ];
+    radiosFiltro.forEach(radio => {
+        if (radio) {
+            radio.addEventListener("change", function() {
+                filtroEstado = radio.value;
+                renderizarJuegos();
+            });
+        }
+    });
 
     obtenerUsuario();
 
