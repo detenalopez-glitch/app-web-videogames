@@ -9,6 +9,28 @@ let juegosDelUsuario = [];
 let usuarioActual = "";
 // Estado del filtro
 let filtroEstado = "todos";
+let filtroBusqueda = "";
+/**
+ * Filtra los juegos por nombre según el texto del buscador.
+ * @param {Array} juegos - Lista de juegos.
+ * @param {string} texto - Texto a buscar.
+ * @returns {Array} Juegos filtrados.
+ */
+function filtrarPorNombre(juegos, texto) {
+    if (!texto) return juegos;
+    return juegos.filter(juego => juego.nombre.toLowerCase().includes(texto.toLowerCase()));
+}
+
+// Escucha el input del buscador
+document.addEventListener("DOMContentLoaded", function() {
+    const buscador = document.getElementById("buscador-juegos");
+    if (buscador) {
+        buscador.addEventListener("input", function(e) {
+            filtroBusqueda = e.target.value;
+            renderizarJuegos();
+        });
+    }
+});
 
 /**
  * Normaliza un valor de porcentaje a un número entre 0 y 100.
@@ -247,16 +269,19 @@ function renderizarJuegos() {
     listaJuegosCompletos.innerHTML = "";
     listaJuegosIncompletos.innerHTML = "";
 
-    juegosDelUsuario.forEach(function(juego, index) {
+    // Filtrar por estado
+    let juegosFiltrados = juegosDelUsuario;
+    if (filtroEstado === "completados") {
+        juegosFiltrados = juegosFiltrados.filter(j => normalizarPorcentaje(j.porcentaje) === 100);
+    } else if (filtroEstado === "incompletos") {
+        juegosFiltrados = juegosFiltrados.filter(j => normalizarPorcentaje(j.porcentaje) < 100);
+    }
+    // Filtrar por nombre
+    juegosFiltrados = filtrarPorNombre(juegosFiltrados, filtroBusqueda);
+
+    juegosFiltrados.forEach(function(juego, index) {
         const porcentaje = normalizarPorcentaje(juego.porcentaje);
         const estilos = obtenerEstilosPorcentaje(porcentaje);
-        // Filtrado
-        if (
-            filtroEstado === "completados" && porcentaje !== 100
-            || filtroEstado === "incompletos" && porcentaje === 100
-        ) {
-            return;
-        }
         const tarjetaJuego = crearTarjetaJuego(
             juego,
             porcentaje,
