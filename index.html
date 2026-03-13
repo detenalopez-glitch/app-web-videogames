@@ -6,21 +6,24 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-black dark:text-white box-border font-principal m-2.5 p-1.5">
-  <!-- Botón para alternar el modo claro/oscuro -->
-  <button id="darkModeToggle" class="m-4 bg-blue-500 dark:bg-blue-700 hover:bg-blue-600 dark:hover:bg-blue-800 transition text-white px-4 py-2 rounded">Modo Oscuro</button>
-  <!-- Botón para abrir menú -->
-  <button id="menuToggle" class="fixed top-4 left-4 z-50 bg-gray-800 text-white rounded-full p-3 shadow-lg focus:outline-none">
-    <span style="font-size: 1.5rem;">☰</span>
-  </button>
+  <div class="flex items-center gap-4 p-4">
+    <!-- Botón para abrir menú -->
+    <button id="menuToggle" class="bg-gray-800 text-white rounded-full p-3 shadow-lg focus:outline-none">
+      <span style="font-size: 1.5rem;">☰</span>
+    </button>
+    <!-- Botón para alternar el modo claro/oscuro -->
+    <button id="darkModeToggle" class="bg-blue-500 dark:bg-blue-700 hover:bg-blue-600 dark:hover:bg-blue-800 transition text-white px-4 py-2 rounded">Modo Oscuro</button>
+    <!-- Input buscador -->
+    <input type="text" id="buscador-juegos" placeholder="Buscar juego..." class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700" style="min-width:200px;">
+  </div>
   <header class="bg-gray-800 dark:bg-gray-900 text-white">
     <h1 class="text-2xl font-bold">Web app</h1>
   </header>
   <main class="flex min-h-[80vh]">
     <!-- Sidebar desplegable -->
     <aside id="sidebarMenu" class="fixed top-0 left-0 h-full w-64" style="background:#111;color:#fff;box-shadow:0 0 20px #000a;" shadow-xl z-40 transition-transform duration-300 transform -translate-x-full">
-      <div class="flex items-center justify-between p-4 border-b border-gray-700">
+      <div class="flex items-center p-4 border-b border-gray-700">
         <span class="font-bold text-xl">Menú</span>
-        <button id="menuClose" class="text-white text-2xl font-bold focus:outline-none">×</button>
       </div>
       <ul class="space-y-2 p-4">
         <li class="p-2 hover:bg-gray-700 rounded cursor-pointer transition" id="menuInicio">Inicio</li>
