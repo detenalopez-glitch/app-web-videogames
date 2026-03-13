@@ -1,3 +1,14 @@
+/* Modo claro: letras negras en los elementos principales */
+.light-mode, .light-mode h1, .light-mode h2, .light-mode h3, .light-mode h4, .light-mode h5, .light-mode h6, .light-mode p, .light-mode label, .light-mode input, .light-mode button, .light-mode span, .light-mode li, .light-mode .font-bold {
+  color: #111 !important;
+}
+.light-mode .bg-black, .light-mode .bg-gray-800, .light-mode .bg-gray-900 {
+  background-color: #f3f4f6 !important;
+}
+.light-mode .bg-opacity-60 {
+  background-color: #f3f4f6 !important;
+  opacity: 1 !important;
+}
 /* Estilos base y utilidades generados (Tailwind + ajustes de reseteo).
    No modificar directamente si se recompila Tailwind; añadir cambios personalizados al final. */
 @layer utilities {
