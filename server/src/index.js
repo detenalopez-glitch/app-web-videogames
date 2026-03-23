@@ -1,23 +1,42 @@
-require('dotenv').config({ path: './src/Config/.env' });
-console.log("Contenido de process.env.PORT:", process.env.PORT);
-
-
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-// Convertimos a número para asegurar que app.listen no se líe
-const PORT = parseInt(process.env.PORT) || 4000; 
+const taskRoutes = require('./routes/task.routes');
 
+const PORT = process.env.PORT || 4000;
 const app = express();
 
+// Middlewares globales
 app.use(cors());
 app.use(express.json());
 
+// Rutas de la API
+app.use('/api/v1/tasks', taskRoutes);
+
+// Ruta de prueba
 app.get('/', (req, res) => {
-    res.send('Servidor funcionando correctamente');
+  res.send('Servidor funcionando correctamente');
 });
 
-// ¡IMPORTANTE! Asegúrate de que el console.log esté DENTRO de las llaves { }
+app.use((err, req, res, next) => {
+
+// 🔥 4. middleware de errores (AQUÍ)
+app.use((err, req, res, next) => {
+  if (err.message === 'NOT_FOUND') {
+    return res.status(404).json({
+      error: 'Recurso no encontrado'
+    });
+  }
+
+  console.error(err);
+
+  res.status(500).json({
+    error: 'Error interno del servidor'
+  });
+});
+});
+// Arranque del servidor
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en: http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
