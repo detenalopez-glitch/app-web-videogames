@@ -166,13 +166,14 @@ function crearTarjetaJuego(juego, porcentaje, estilos, onEliminarClick) {
                     ${porcentaje}%
                 </div>
             </div>
-        </div>
-        <button class="btn-editar absolute top-3 left-3 bg-blue-700 hover:bg-blue-800 text-white text-xs px-3 py-1 rounded transition">
-            Editar
-        </button>
-        <button class="btn-eliminar absolute top-3 right-3 bg-red-700 hover:bg-red-800 text-white text-xs px-3 py-1 rounded transition">
-            Eliminar
-        </button>
+            <div class="flex justify-between items-center gap-2 px-2 pb-4 pt-3 mt-auto">
+                <button class="btn-eliminar bg-gray-700 hover:bg-red-700 text-white text-xs px-3 py-1 rounded-lg font-bold shadow transition w-1/2 mr-1">
+                    <span style="font-size:1.1em;vertical-align:middle;">🗑️</span> Eliminar
+                </button>
+                <button class="btn-editar bg-gray-700 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-lg font-bold shadow transition w-1/2 ml-1">
+                    <span style="font-size:1.1em;vertical-align:middle;">✏️</span> Editar
+                </button>
+            </div>
     `;
     // Botón editar
     const botonEditar = tarjeta.querySelector(".btn-editar");
@@ -450,32 +451,36 @@ function guardarEnLocalStorage() {
 }
 //cargar datos al iniciar la página
 window.addEventListener("DOMContentLoaded", function() {
-        // Sidebar menú
-        const sidebar = document.getElementById("sidebarMenu");
-        const menuToggle = document.getElementById("menuToggle");
-        const menuClose = document.getElementById("menuClose");
-        if (menuToggle && sidebar) {
-            menuToggle.addEventListener("click", () => {
-                sidebar.style.transform = "translateX(0)";
-            });
-        }
-        if (menuClose && sidebar) {
-            menuClose.addEventListener("click", () => {
-                sidebar.style.transform = "translateX(-100%)";
-            });
-        }
-        // Opciones de menú (puedes agregar navegación real aquí)
-        const menuInicio = document.getElementById("menuInicio");
-        const menuJuegos100 = document.getElementById("menuJuegos100");
-        const menuPorCompletar = document.getElementById("menuPorCompletar");
-        [menuInicio, menuJuegos100, menuPorCompletar].forEach(item => {
-            if (item) {
-                item.addEventListener("click", () => {
-                    sidebar.style.transform = "translateX(-100%)";
-                    // Aquí puedes agregar lógica para mostrar la sección correspondiente
-                });
-            }
+    // Sidebar menú (abre/cierra con el mismo botón, sin depender de clases de Tailwind)
+    const sidebar = document.getElementById("sidebarMenu");
+    const menuToggle = document.getElementById("menuToggle");
+    let menuAbierto = false;
+
+    if (sidebar) {
+        // Aseguramos estado inicial oculto por si las clases CSS no están aplicadas
+        sidebar.style.transform = "translateX(-100%)";
+    }
+
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener("click", () => {
+            menuAbierto = !menuAbierto;
+            sidebar.style.transform = menuAbierto ? "translateX(0)" : "translateX(-100%)";
         });
+    }
+
+    // Opciones de menú: al hacer clic, se cierra el sidebar
+    const menuInicio = document.getElementById("menuInicio");
+    const menuJuegos100 = document.getElementById("menuJuegos100");
+    const menuPorCompletar = document.getElementById("menuPorCompletar");
+    [menuInicio, menuJuegos100, menuPorCompletar].forEach(item => {
+        if (item && sidebar) {
+            item.addEventListener("click", () => {
+                menuAbierto = false;
+                sidebar.style.transform = "translateX(-100%)";
+                // Aquí puedes agregar lógica para mostrar la sección correspondiente
+            });
+        }
+    });
     // Filtros de estado
     const radiosFiltro = [
         document.getElementById("filtro-todos"),
