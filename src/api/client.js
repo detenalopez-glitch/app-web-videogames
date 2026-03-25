@@ -1,7 +1,7 @@
 // Cliente para consumir la API desde el frontend
-// Ajusta la URL base según tu entorno de backend
+// Cambia la URL base según tu entorno
 
-const API_BASE = "/api/tasks";
+const API_BASE = "http://localhost:3000/api/v1/tasks";
 
 export async function getTasks() {
     const res = await fetch(API_BASE);

@@ -1,41 +1,39 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path'); // ← faltaba esto
 
-const taskRoutes = require('./routes/task.routes');
+const taskRoutes = require('./src/routes/task.routes');
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 // Middlewares globales
 app.use(cors());
 app.use(express.json());
 
-// Rutas de la API
-app.use('/api/v1/tasks', taskRoutes);
+// Servir archivos estáticos del frontend
+app.use(express.static(path.join(__dirname, '../'))); // ← corregido pp → app
 
-// Ruta de prueba
+// Rutas de la API
+app.use(express.static(path.join(__dirname, '../')));
 app.get('/', (req, res) => {
-  res.send('Servidor funcionando correctamente');
+  res.sendFile(path.join(__dirname, '../index.html'));
 });
 
-app.use((err, req, res, next) => {
-
-// 🔥 4. middleware de errores (AQUÍ)
+// Middleware de errores
 app.use((err, req, res, next) => {
   if (err.message === 'NOT_FOUND') {
     return res.status(404).json({
       error: 'Recurso no encontrado'
     });
   }
-
   console.error(err);
-
   res.status(500).json({
     error: 'Error interno del servidor'
   });
 });
-});
+
 // Arranque del servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
