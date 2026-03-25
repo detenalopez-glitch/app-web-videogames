@@ -1,3 +1,5 @@
+import { getTasks, createTask, deleteTask } from "./src/api/client.js";
+
 const formularioJuego = document.getElementById("form-juego");
 const inputNombreJuego = document.getElementById("input-juego");
 const inputDescripcionJuego = document.getElementById("input-descripcion");
@@ -10,6 +12,48 @@ let usuarioActual = "";
 // Estado del filtro
 let filtroEstado = "todos";
 let filtroBusqueda = "";
+
+// ----- Estado de red (loading / success / error) -----
+let redCargando = false;
+
+function setLoadingUI() {
+  redCargando = true;
+  if (listaJuegosCompletos) {
+    listaJuegosCompletos.innerHTML = '<p class="text-sm text-blue-200">Cargando...</p>';
+  }
+  if (listaJuegosIncompletos) {
+    listaJuegosIncompletos.innerHTML = '<p class="text-sm text-blue-200">Cargando...</p>';
+  }
+
+  // Deshabilita el submit mientras llega la respuesta
+  if (formularioJuego) {
+    const boton = formularioJuego.querySelector('button[type="submit"]');
+    if (boton) boton.disabled = true;
+  }
+}
+
+function setErrorUI(mensaje) {
+  redCargando = false;
+  if (listaJuegosCompletos) {
+    listaJuegosCompletos.innerHTML = `<p class="text-sm text-red-300">Error: ${mensaje}</p>`;
+  }
+  if (listaJuegosIncompletos) {
+    listaJuegosIncompletos.innerHTML = `<p class="text-sm text-red-300">Error: ${mensaje}</p>`;
+  }
+
+  if (formularioJuego) {
+    const boton = formularioJuego.querySelector('button[type="submit"]');
+    if (boton) boton.disabled = false;
+  }
+}
+
+function setSuccessUI() {
+  redCargando = false;
+  if (formularioJuego) {
+    const boton = formularioJuego.querySelector('button[type="submit"]');
+    if (boton) boton.disabled = false;
+  }
+}
 /**
  * Filtra los juegos por nombre según el texto del buscador.
  * @param {Array} juegos - Lista de juegos.
@@ -68,78 +112,13 @@ function obtenerEstilosPorcentaje(porcentaje) {
 }
 
 /**
- * Obtiene el usuario actual desde localStorage o lo crea si no existe.
- * Actualiza la variable global `usuarioActual`.
- * @returns {string} Nombre del usuario actual.
+ * En esta versión el frontend depende del backend para persistir.
+ * No usamos localStorage para “usuario” (backend no maneja usuario).
+ * @returns {string}
  */
 function obtenerUsuario() {
-    let usuario = localStorage.getItem("usuario");
-    if (!usuario) {
-        mostrarPopupUsuario(function(nombreUsuario) {
-            usuario = nombreUsuario || "anonimo";
-            localStorage.setItem("usuario", usuario);
-            usuarioActual = usuario;
-            renderizarJuegos();
-        });
-        return "anonimo";
-    }
-    usuarioActual = usuario;
-    return usuario;
-
-// Popup para pedir usuario
-function mostrarPopupUsuario(callback) {
-    const fondo = document.createElement("div");
-    fondo.style.position = "fixed";
-    fondo.style.top = "0";
-    fondo.style.left = "0";
-    fondo.style.width = "100vw";
-    fondo.style.height = "100vh";
-    fondo.style.background = "rgba(80,80,80,0.5)";
-    fondo.style.zIndex = "1000";
-
-    const form = document.createElement("form");
-    form.className = "popup-centro bg-gray-200 dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col gap-4";
-    form.style.position = "absolute";
-    form.style.top = "50%";
-    form.style.left = "50%";
-    form.style.transform = "translate(-50%, -50%)";
-    form.innerHTML = `
-        <h3 class="text-lg font-bold mb-2">Ingresa tu nombre de usuario</h3>
-        <input type="text" name="usuario" class="border p-2 rounded" required autofocus>
-        <div class="flex gap-2">
-            <button type="submit" class="btn-popup">Aceptar</button>
-            <button type="button" class="btn-popup btn-cerrar">Cancelar</button>
-        </div>
-    `;
-    fondo.appendChild(form);
-    document.body.appendChild(fondo);
-    // Estilos botones
-    fondo.querySelectorAll('.btn-popup').forEach(btn => {
-        btn.style.border = '2px solid #8B5CF6'; // morado
-        btn.style.background = 'transparent';
-        btn.style.color = '#fff';
-        btn.style.padding = '0.5rem 1.5rem';
-        btn.style.borderRadius = '0.5rem';
-        btn.style.fontWeight = 'bold';
-        btn.style.transition = 'background 0.2s';
-        btn.addEventListener('mouseover', () => {
-            btn.style.background = '#8B5CF6';
-        });
-        btn.addEventListener('mouseout', () => {
-            btn.style.background = 'transparent';
-        });
-    });
-    form.querySelector(".btn-cerrar").addEventListener("click", function() {
-        document.body.removeChild(fondo);
-        callback("anonimo");
-    });
-    form.addEventListener("submit", function(e) {
-        e.preventDefault();
-        const nombre = form.usuario.value.trim();
-        document.body.removeChild(fondo);
-        callback(nombre);
-    });
-}
+    usuarioActual = "anonimo";
+    return usuarioActual;
 }
 
 /**
@@ -259,9 +238,16 @@ formularioJuego.addEventListener("submit", function(e) {
  * @param {{ nombre: string, descripcion: string, porcentaje: number }} juego - Juego a añadir.
  */
 function agregarJuego(juego) {
-    juegosDelUsuario.push(juego);
-    guardarEnLocalStorage();
-    renderizarJuegos();
+    setLoadingUI();
+    // Llamada al backend para crear la tarea con todos los campos necesarios
+    createTask({
+        nombre: juego.nombre,
+        descripcion: juego.descripcion,
+        porcentaje: juego.porcentaje
+    })
+        .then(() => cargarJuegosDesdeBackend())
+        .then(() => setSuccessUI())
+        .catch((err) => setErrorUI(err?.message || "Error al crear la tarea"));
 }
 /**
  * Renderiza en el DOM la lista de juegos completos e incompletos del usuario actual.
@@ -288,7 +274,7 @@ function renderizarJuegos() {
             porcentaje,
             estilos,
             function () {
-                confirmarEliminar(index);
+                confirmarEliminar(juego.id);
             }
         );
         tarjetaJuego.dataset.index = index;
@@ -375,10 +361,10 @@ function mostrarFormularioEdicion(juego) {
  * Muestra un cuadro de confirmación antes de eliminar un juego.
  * @param {number} index - Índice del juego en el arreglo `juegosDelUsuario`.
  */
-function confirmarEliminar(index) {
+function confirmarEliminar(id) {
     mostrarPopupEliminar(function(confirmado) {
         if (confirmado) {
-            eliminarJuego(index);
+            eliminarJuego(id);
         }
     });
 
@@ -439,15 +425,43 @@ function mostrarPopupEliminar(callback) {
  * @param {number} index - Índice del juego a eliminar.
  */
 function eliminarJuego(index) {
-    juegosDelUsuario.splice(index, 1);
-    guardarEnLocalStorage();
-    renderizarJuegos();
+    setLoadingUI();
+    // Se espera que index sea el id real de la tarea en el backend
+    deleteTask(index)
+        .then(() => cargarJuegosDesdeBackend())
+        .then(() => setSuccessUI())
+        .catch((err) => setErrorUI(err?.message || "Error al eliminar la tarea"));
 }
 /**
- * Guarda la lista de juegos del usuario actual en localStorage.
+ * Persistencia local ya no se usa: el backend es la fuente de la verdad.
  */
 function guardarEnLocalStorage() {
-    localStorage.setItem("juegos_" + usuarioActual, JSON.stringify(juegosDelUsuario));
+    // No-op: la persistencia ahora es manejada por el backend
+}
+
+function mapearTareaATareaUI(tarea) {
+    return {
+        id: tarea.id,
+        nombre: tarea.titulo,
+        descripcion: "",
+        porcentaje: tarea.progreso,
+    };
+}
+
+/**
+ * Carga las tareas desde el backend y refresca la UI.
+ * Maneja estados: loading / success / error.
+ */
+async function cargarJuegosDesdeBackend() {
+    setLoadingUI();
+    try {
+        const tareas = await getTasks();
+        juegosDelUsuario = tareas.map(mapearTareaATareaUI);
+        renderizarJuegos();
+        setSuccessUI();
+    } catch (err) {
+        setErrorUI(err?.message || "Error al cargar las tareas");
+    }
 }
 //cargar datos al iniciar la página
 window.addEventListener("DOMContentLoaded", function() {
@@ -496,33 +510,13 @@ window.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    obtenerUsuario();
-
-    const datosGuardados = localStorage.getItem("juegos_" + usuarioActual);
-    if (datosGuardados) {
-        juegosDelUsuario = JSON.parse(datosGuardados);
-    } else {
-        // Juegos de prueba para ver los colores
-        juegosDelUsuario = [
-            { nombre: "Juego Verde", descripcion: "Completado al 100%", porcentaje: 100 },
-            { nombre: "Juego Naranja", descripcion: "Completado al 75%", porcentaje: 75 },
-            { nombre: "Juego Rojo", descripcion: "Completado al 30%", porcentaje: 30 }
-        ];
-    }
-    renderizarJuegos();
-
-    // Persistencia del modo oscuro
-    if (localStorage.getItem("modoOscuro") === "true") {
-        document.documentElement.classList.add("dark");
-    } else {
-        document.documentElement.classList.remove("dark");
-    }
+    // Carga desde backend (sin localStorage)
+    cargarJuegosDesdeBackend();
 
     const botonDark = document.getElementById("darkModeToggle");
     if (botonDark) {
         botonDark.addEventListener("click", () => {
             document.documentElement.classList.toggle("dark");
-            localStorage.setItem("modoOscuro", document.documentElement.classList.contains("dark"));
         });
     }
 });
