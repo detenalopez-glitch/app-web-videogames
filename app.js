@@ -1,3 +1,5 @@
+import { getTasks, createTask, deleteTask } from "./src/api/client.js";
+
 const formularioJuego = document.getElementById("form-juego");
 const inputNombreJuego = document.getElementById("input-juego");
 const inputDescripcionJuego = document.getElementById("input-descripcion");
@@ -7,86 +9,48 @@ const listaJuegosIncompletos = document.getElementById("lista-juegos-incompletos
 
 let juegosDelUsuario = [];
 let usuarioActual = "";
-// Estado del filtro
 let filtroEstado = "todos";
 let filtroBusqueda = "";
-/**
- * Filtra los juegos por nombre según el texto del buscador.
- * @param {Array} juegos - Lista de juegos.
- * @param {string} texto - Texto a buscar.
- * @returns {Array} Juegos filtrados.
- */
+let estadoCarga = false;
+let estadoError = "";
+
 function filtrarPorNombre(juegos, texto) {
     if (!texto) return juegos;
     return juegos.filter(juego => juego.nombre.toLowerCase().includes(texto.toLowerCase()));
 }
 
-// Escucha el input del buscador
-document.addEventListener("DOMContentLoaded", function() {
-    const buscador = document.getElementById("buscador-juegos");
-    if (buscador) {
-        buscador.addEventListener("input", function(e) {
-            filtroBusqueda = e.target.value;
-            renderizarJuegos();
-        });
-    }
-});
-
-/**
- * Normaliza un valor de porcentaje a un número entre 0 y 100.
- * @param {number|string} valor - Valor introducido por el usuario.
- * @returns {number} Porcentaje limitado entre 0 y 100.
- */
 function normalizarPorcentaje(valor) {
     const numero = Number(valor);
     if (Number.isNaN(numero)) return 0;
     return Math.min(100, Math.max(0, numero));
 }
 
-/**
- * Devuelve las clases de estilo correspondientes a un porcentaje.
- * @param {number} porcentaje - Porcentaje del progreso del juego.
- * @returns {{ borderClass: string, progressColor: string }} Clases CSS para borde y barra de progreso.
- */
 function obtenerEstilosPorcentaje(porcentaje) {
     if (porcentaje === 100) {
-        return {
-            borderClass: "border-green-500",
-            progressColor: "bg-green-500",
-        };
+        return { borderClass: "border-green-500", progressColor: "bg-green-500" };
     }
     if (porcentaje >= 50) {
-        return {
-            borderClass: "border-orange-500",
-            progressColor: "bg-orange-500",
-        };
+        return { borderClass: "border-orange-500", progressColor: "bg-orange-500" };
     }
-    return {
-        borderClass: "border-red-500",
-        progressColor: "bg-red-500",
-    };
+    return { borderClass: "border-red-500", progressColor: "bg-red-500" };
 }
 
-/**
- * Obtiene el usuario actual desde localStorage o lo crea si no existe.
- * Actualiza la variable global `usuarioActual`.
- * @returns {string} Nombre del usuario actual.
- */
-function obtenerUsuario() {
-    let usuario = localStorage.getItem("usuario");
-    if (!usuario) {
-        mostrarPopupUsuario(function(nombreUsuario) {
-            usuario = nombreUsuario || "anonimo";
-            localStorage.setItem("usuario", usuario);
-            usuarioActual = usuario;
-            renderizarJuegos();
-        });
-        return "anonimo";
-    }
-    usuarioActual = usuario;
-    return usuario;
 
-// Popup para pedir usuario
+// Solicita el usuario solo una vez al iniciar la app
+function solicitarUsuarioAlInicio(callback) {
+    const usuarioGuardado = localStorage.getItem("usuarioApp");
+    if (usuarioGuardado) {
+        usuarioActual = usuarioGuardado;
+        callback();
+    } else {
+        mostrarPopupUsuario(function(nombreUsuario) {
+            usuarioActual = nombreUsuario || "anonimo";
+            localStorage.setItem("usuarioApp", usuarioActual);
+            callback();
+        });
+    }
+}
+
 function mostrarPopupUsuario(callback) {
     const fondo = document.createElement("div");
     fondo.style.position = "fixed";
@@ -113,22 +77,19 @@ function mostrarPopupUsuario(callback) {
     `;
     fondo.appendChild(form);
     document.body.appendChild(fondo);
-    // Estilos botones
+
     fondo.querySelectorAll('.btn-popup').forEach(btn => {
-        btn.style.border = '2px solid #8B5CF6'; // morado
+        btn.style.border = '2px solid #8B5CF6';
         btn.style.background = 'transparent';
         btn.style.color = '#fff';
         btn.style.padding = '0.5rem 1.5rem';
         btn.style.borderRadius = '0.5rem';
         btn.style.fontWeight = 'bold';
         btn.style.transition = 'background 0.2s';
-        btn.addEventListener('mouseover', () => {
-            btn.style.background = '#8B5CF6';
-        });
-        btn.addEventListener('mouseout', () => {
-            btn.style.background = 'transparent';
-        });
+        btn.addEventListener('mouseover', () => { btn.style.background = '#8B5CF6'; });
+        btn.addEventListener('mouseout', () => { btn.style.background = 'transparent'; });
     });
+
     form.querySelector(".btn-cerrar").addEventListener("click", function() {
         document.body.removeChild(fondo);
         callback("anonimo");
@@ -140,22 +101,34 @@ function mostrarPopupUsuario(callback) {
         callback(nombre);
     });
 }
+
+// ✅ Carga juegos desde la API
+async function cargarJuegos() {
+    estadoCarga = true;
+    estadoError = "";
+    renderizarJuegos();
+    try {
+        const tareas = await getTasks();
+        juegosDelUsuario = tareas.map(t => ({
+            id: t.id,
+            nombre: t.titulo,
+            descripcion: t.descripcion || "",
+            porcentaje: t.progreso
+        }));
+    } catch (error) {
+        console.error("Error cargando juegos:", error);
+        juegosDelUsuario = [];
+        estadoError = "Error al cargar los juegos. Intenta de nuevo.";
+    } finally {
+        estadoCarga = false;
+        renderizarJuegos();
+    }
 }
 
-/**
- * Crea el elemento DOM de una tarjeta de juego.
- * @param {{ nombre: string, descripcion: string, porcentaje: number }} juego - Datos del juego.
- * @param {number} porcentaje - Porcentaje normalizado del juego.
- * @param {{ borderClass: string, progressColor: string }} estilos - Clases de estilo según el porcentaje.
- * @param {() => void} onEliminarClick - Callback que se ejecuta al hacer clic en "Eliminar".
- * @returns {HTMLDivElement} Tarjeta lista para insertarse en el DOM.
- */
 function crearTarjetaJuego(juego, porcentaje, estilos, onEliminarClick) {
     const { borderClass, progressColor } = estilos;
-
     const tarjeta = document.createElement("div");
-    tarjeta.className = `relative rounded-xl border-4 ${borderClass} bg-gray-800 bg-opacity-90 p-8 mb-6 shadow-lg flex flex-col`;
-
+    tarjeta.className = `relative rounded-xl border-4 ${borderClass} bg-gray-800 bg-opacity-90 p-8 mb-6 shadow-lg flex flex-col transition-opacity duration-500 opacity-0`;
     tarjeta.innerHTML = `
         <div class="flex flex-col gap-2">
             <h4 class="text-lg font-bold mb-1">${juego.nombre}</h4>
@@ -174,27 +147,21 @@ function crearTarjetaJuego(juego, porcentaje, estilos, onEliminarClick) {
                     <span style="font-size:1.1em;vertical-align:middle;">✏️</span> Editar
                 </button>
             </div>
+        </div>
     `;
-    // Botón editar
-    const botonEditar = tarjeta.querySelector(".btn-editar");
-    if (botonEditar) {
-        botonEditar.addEventListener("click", function() {
-            mostrarFormularioEdicion(juego);
-        });
-    }
 
-    const botonEliminar = tarjeta.querySelector(".btn-eliminar");
-    if (botonEliminar) {
-        botonEliminar.addEventListener("click", onEliminarClick);
-    }
+    tarjeta.querySelector(".btn-editar").addEventListener("click", function() {
+        mostrarFormularioEdicion(juego);
+    });
+    tarjeta.querySelector(".btn-eliminar").addEventListener("click", onEliminarClick);
 
+    // Forzar reflujo y luego hacer visible para activar la transición
+    setTimeout(() => {
+        tarjeta.style.opacity = '1';
+    }, 10);
     return tarjeta;
 }
 
-/**
- * Maneja el envío del formulario de juegos: valida datos y agrega un nuevo juego.
- * @param {SubmitEvent} e - Evento de envío del formulario.
- */
 formularioJuego.addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -202,21 +169,16 @@ formularioJuego.addEventListener("submit", function(e) {
     const descripcionJuego = inputDescripcionJuego.value.trim();
     const valorPorcentaje = inputPorcentajeJuego.value.trim();
 
-    // Validación: nombre obligatorio
     if (!nombreJuego) {
         alert("Por favor, ingresa el nombre del juego.");
         inputNombreJuego.focus();
         return;
     }
-
-    // Validación: descripción mínima
     if (descripcionJuego.length < 3) {
         alert("La descripción debe tener al menos 3 caracteres.");
         inputDescripcionJuego.focus();
         return;
     }
-
-    // Validación: porcentaje numérico entre 0 y 100
     const numeroPorcentaje = Number(valorPorcentaje);
     if (Number.isNaN(numeroPorcentaje)) {
         alert("Por favor, ingresa un porcentaje numérico entre 0 y 100.");
@@ -228,8 +190,6 @@ formularioJuego.addEventListener("submit", function(e) {
         inputPorcentajeJuego.focus();
         return;
     }
-
-    // Validación: evitar juegos duplicados por nombre (ignorando mayúsculas/minúsculas)
     const juegoExistente = juegosDelUsuario.some(
         (juego) => juego.nombre.toLowerCase() === nombreJuego.toLowerCase()
     );
@@ -240,57 +200,89 @@ formularioJuego.addEventListener("submit", function(e) {
     }
 
     const porcentajeNormalizado = normalizarPorcentaje(numeroPorcentaje);
-
-    const nuevoJuego = {
-        nombre: nombreJuego,
-        descripcion: descripcionJuego,
-        porcentaje: porcentajeNormalizado,
-    };
-
-    agregarJuego(nuevoJuego);
+    agregarJuego({ nombre: nombreJuego, descripcion: descripcionJuego, porcentaje: porcentajeNormalizado });
 
     inputNombreJuego.value = "";
     inputDescripcionJuego.value = "";
     inputPorcentajeJuego.value = "";
-}); // Función para agregar un juego
+});
 
-/**
- * Agrega un juego al listado del usuario y actualiza la vista y el almacenamiento.
- * @param {{ nombre: string, descripcion: string, porcentaje: number }} juego - Juego a añadir.
- */
-function agregarJuego(juego) {
-    juegosDelUsuario.push(juego);
-    guardarEnLocalStorage();
-    renderizarJuegos();
+// ✅ Agrega juego via API
+async function agregarJuego(juego) {
+    try {
+        const creado = await createTask({
+            titulo: juego.nombre,
+            progreso: juego.porcentaje,
+            descripcion: juego.descripcion
+        });
+        juego.id = creado.id;
+        juegosDelUsuario.push(juego);
+
+        // Verificar si el juego cumple los filtros activos
+        let cumpleFiltro = true;
+        if (filtroEstado === "completados" && normalizarPorcentaje(juego.porcentaje) !== 100) cumpleFiltro = false;
+        if (filtroEstado === "incompletos" && normalizarPorcentaje(juego.porcentaje) === 100) cumpleFiltro = false;
+        if (filtroBusqueda && !juego.nombre.toLowerCase().includes(filtroBusqueda.toLowerCase())) cumpleFiltro = false;
+
+        if (cumpleFiltro) {
+            const porcentaje = normalizarPorcentaje(juego.porcentaje);
+            const estilos = obtenerEstilosPorcentaje(porcentaje);
+            const tarjetaJuego = crearTarjetaJuego(
+                juego,
+                porcentaje,
+                estilos,
+                function() { confirmarEliminar(juegosDelUsuario.length - 1); }
+            );
+            tarjetaJuego.dataset.index = juegosDelUsuario.length - 1;
+            if (porcentaje === 100) {
+                listaJuegosCompletos.appendChild(tarjetaJuego);
+            } else {
+                listaJuegosIncompletos.appendChild(tarjetaJuego);
+            }
+        }
+    } catch (error) {
+        alert("Error al guardar el juego: " + error.message);
+    }
 }
-/**
- * Renderiza en el DOM la lista de juegos completos e incompletos del usuario actual.
- */
+
 function renderizarJuegos() {
     listaJuegosCompletos.innerHTML = "";
     listaJuegosIncompletos.innerHTML = "";
 
-    // Filtrar por estado
+    // Estado de carga
+    if (estadoCarga) {
+        const loader = document.createElement("div");
+        loader.className = "text-center text-lg text-purple-500 py-8 animate-pulse";
+        loader.textContent = "Cargando juegos...";
+        listaJuegosCompletos.appendChild(loader);
+        listaJuegosIncompletos.appendChild(loader.cloneNode(true));
+        return;
+    }
+
+    // Estado de error
+    if (estadoError) {
+        const errorDiv = document.createElement("div");
+        errorDiv.className = "text-center text-lg text-red-500 py-8";
+        errorDiv.textContent = estadoError;
+        listaJuegosCompletos.appendChild(errorDiv);
+        listaJuegosIncompletos.appendChild(errorDiv.cloneNode(true));
+        return;
+    }
+
     let juegosFiltrados = juegosDelUsuario;
     if (filtroEstado === "completados") {
         juegosFiltrados = juegosFiltrados.filter(j => normalizarPorcentaje(j.porcentaje) === 100);
     } else if (filtroEstado === "incompletos") {
         juegosFiltrados = juegosFiltrados.filter(j => normalizarPorcentaje(j.porcentaje) < 100);
     }
-    // Filtrar por nombre
     juegosFiltrados = filtrarPorNombre(juegosFiltrados, filtroBusqueda);
 
     juegosFiltrados.forEach(function(juego, index) {
         const porcentaje = normalizarPorcentaje(juego.porcentaje);
         const estilos = obtenerEstilosPorcentaje(porcentaje);
-        const tarjetaJuego = crearTarjetaJuego(
-            juego,
-            porcentaje,
-            estilos,
-            function () {
-                confirmarEliminar(index);
-            }
-        );
+        const tarjetaJuego = crearTarjetaJuego(juego, porcentaje, estilos, function() {
+            confirmarEliminar(index);
+        });
         tarjetaJuego.dataset.index = index;
         if (porcentaje === 100) {
             listaJuegosCompletos.appendChild(tarjetaJuego);
@@ -300,9 +292,7 @@ function renderizarJuegos() {
     });
 }
 
-// Formulario flotante para editar juego
 function mostrarFormularioEdicion(juego) {
-    // Crear fondo modal
     const fondo = document.createElement("div");
     fondo.style.position = "fixed";
     fondo.style.top = "0";
@@ -312,7 +302,6 @@ function mostrarFormularioEdicion(juego) {
     fondo.style.background = "rgba(0,0,0,0.5)";
     fondo.style.zIndex = "1000";
 
-    // Crear formulario
     const form = document.createElement("form");
     form.className = "bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col gap-4 max-w-md mx-auto mt-32";
     form.innerHTML = `
@@ -325,64 +314,47 @@ function mostrarFormularioEdicion(juego) {
             <button type="button" class="bg-gray-400 hover:bg-gray-500 text-black px-4 py-2 rounded btn-cerrar">Cancelar</button>
         </div>
     `;
-
     fondo.appendChild(form);
     document.body.appendChild(fondo);
 
-    // Cerrar modal
     form.querySelector(".btn-cerrar").addEventListener("click", function() {
         document.body.removeChild(fondo);
     });
 
-    // Guardar cambios
     form.addEventListener("submit", function(e) {
         e.preventDefault();
         const nombre = form.nombre.value.trim();
         const descripcion = form.descripcion.value.trim();
         const porcentaje = normalizarPorcentaje(form.porcentaje.value);
 
-        if (!nombre) {
-            alert("El nombre es obligatorio.");
-            return;
-        }
-        if (descripcion.length < 3) {
-            alert("La descripción debe tener al menos 3 caracteres.");
-            return;
-        }
-        if (porcentaje < 0 || porcentaje > 100) {
-            alert("El porcentaje debe estar entre 0 y 100.");
-            return;
-        }
+        if (!nombre) { alert("El nombre es obligatorio."); return; }
+        if (descripcion.length < 3) { alert("La descripción debe tener al menos 3 caracteres."); return; }
 
-        // Evitar duplicados por nombre (excepto el mismo juego)
-        const index = juegosDelUsuario.findIndex(j => j.nombre === juego.nombre && j.descripcion === juego.descripcion && j.porcentaje === juego.porcentaje);
+        const index = juegosDelUsuario.findIndex(j => j.id === juego.id);
         if (index !== -1) {
-            // Verificar si el nuevo nombre ya existe en otro juego
             const nombreDuplicado = juegosDelUsuario.some((j, i) => i !== index && j.nombre.toLowerCase() === nombre.toLowerCase());
-            if (nombreDuplicado) {
-                alert("Ya tienes un juego con ese nombre.");
-                return;
+            if (nombreDuplicado) { alert("Ya tienes un juego con ese nombre."); return; }
+            juegosDelUsuario[index] = { ...juego, nombre, descripcion, porcentaje };
+            // Actualizar solo la tarjeta correspondiente
+            const selector = `[data-index="${index}"]`;
+            const tarjetaAntigua = document.querySelector(selector);
+            if (tarjetaAntigua && tarjetaAntigua.parentNode) {
+                const estilos = obtenerEstilosPorcentaje(porcentaje);
+                const nuevaTarjeta = crearTarjetaJuego(juegosDelUsuario[index], porcentaje, estilos, function() { confirmarEliminar(index); });
+                nuevaTarjeta.dataset.index = index;
+                tarjetaAntigua.parentNode.replaceChild(nuevaTarjeta, tarjetaAntigua);
             }
-            juegosDelUsuario[index] = { nombre, descripcion, porcentaje };
-            guardarEnLocalStorage();
-            renderizarJuegos();
         }
         document.body.removeChild(fondo);
     });
 }
 
-/**
- * Muestra un cuadro de confirmación antes de eliminar un juego.
- * @param {number} index - Índice del juego en el arreglo `juegosDelUsuario`.
- */
 function confirmarEliminar(index) {
     mostrarPopupEliminar(function(confirmado) {
-        if (confirmado) {
-            eliminarJuego(index);
-        }
+        if (confirmado) eliminarJuego(index);
     });
+}
 
-// Popup para confirmar eliminación
 function mostrarPopupEliminar(callback) {
     const fondo = document.createElement("div");
     fondo.style.position = "fixed";
@@ -408,22 +380,19 @@ function mostrarPopupEliminar(callback) {
     `;
     fondo.appendChild(modal);
     document.body.appendChild(fondo);
-    // Estilos botones
+
     fondo.querySelectorAll('.btn-popup').forEach(btn => {
-        btn.style.border = '2px solid #8B5CF6'; // morado
+        btn.style.border = '2px solid #8B5CF6';
         btn.style.background = 'transparent';
         btn.style.color = '#fff';
         btn.style.padding = '0.5rem 1.5rem';
         btn.style.borderRadius = '0.5rem';
         btn.style.fontWeight = 'bold';
         btn.style.transition = 'background 0.2s';
-        btn.addEventListener('mouseover', () => {
-            btn.style.background = '#8B5CF6';
-        });
-        btn.addEventListener('mouseout', () => {
-            btn.style.background = 'transparent';
-        });
+        btn.addEventListener('mouseover', () => { btn.style.background = '#8B5CF6'; });
+        btn.addEventListener('mouseout', () => { btn.style.background = 'transparent'; });
     });
+
     modal.querySelector(".btn-si").addEventListener("click", function() {
         document.body.removeChild(fondo);
         callback(true);
@@ -433,33 +402,35 @@ function mostrarPopupEliminar(callback) {
         callback(false);
     });
 }
+
+
+// ✅ Elimina juego via API y DOM incremental
+async function eliminarJuego(index) {
+    const juego = juegosDelUsuario[index];
+    try {
+        await deleteTask(juego.id);
+        juegosDelUsuario.splice(index, 1);
+        // Eliminar solo la tarjeta correspondiente del DOM
+        const selector = `[data-index="${index}"]`;
+        const tarjeta = document.querySelector(selector);
+        if (tarjeta && tarjeta.parentNode) {
+            tarjeta.parentNode.removeChild(tarjeta);
+        }
+        // Reasignar data-index a las tarjetas restantes
+        document.querySelectorAll('[data-index]').forEach((el, i) => {
+            el.dataset.index = i;
+        });
+    } catch (error) {
+        alert("Error al eliminar: " + error.message);
+    }
 }
-/**
- * Elimina un juego por índice y actualiza almacenamiento y renderizado.
- * @param {number} index - Índice del juego a eliminar.
- */
-function eliminarJuego(index) {
-    juegosDelUsuario.splice(index, 1);
-    guardarEnLocalStorage();
-    renderizarJuegos();
-}
-/**
- * Guarda la lista de juegos del usuario actual en localStorage.
- */
-function guardarEnLocalStorage() {
-    localStorage.setItem("juegos_" + usuarioActual, JSON.stringify(juegosDelUsuario));
-}
-//cargar datos al iniciar la página
+
 window.addEventListener("DOMContentLoaded", function() {
-    // Sidebar menú (abre/cierra con el mismo botón, sin depender de clases de Tailwind)
     const sidebar = document.getElementById("sidebarMenu");
     const menuToggle = document.getElementById("menuToggle");
     let menuAbierto = false;
 
-    if (sidebar) {
-        // Aseguramos estado inicial oculto por si las clases CSS no están aplicadas
-        sidebar.style.transform = "translateX(-100%)";
-    }
+    if (sidebar) sidebar.style.transform = "translateX(-100%)";
 
     if (menuToggle && sidebar) {
         menuToggle.addEventListener("click", () => {
@@ -468,7 +439,6 @@ window.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Opciones de menú: al hacer clic, se cierra el sidebar
     const menuInicio = document.getElementById("menuInicio");
     const menuJuegos100 = document.getElementById("menuJuegos100");
     const menuPorCompletar = document.getElementById("menuPorCompletar");
@@ -477,11 +447,10 @@ window.addEventListener("DOMContentLoaded", function() {
             item.addEventListener("click", () => {
                 menuAbierto = false;
                 sidebar.style.transform = "translateX(-100%)";
-                // Aquí puedes agregar lógica para mostrar la sección correspondiente
             });
         }
     });
-    // Filtros de estado
+
     const radiosFiltro = [
         document.getElementById("filtro-todos"),
         document.getElementById("filtro-completados"),
@@ -496,33 +465,23 @@ window.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    obtenerUsuario();
-
-    const datosGuardados = localStorage.getItem("juegos_" + usuarioActual);
-    if (datosGuardados) {
-        juegosDelUsuario = JSON.parse(datosGuardados);
-    } else {
-        // Juegos de prueba para ver los colores
-        juegosDelUsuario = [
-            { nombre: "Juego Verde", descripcion: "Completado al 100%", porcentaje: 100 },
-            { nombre: "Juego Naranja", descripcion: "Completado al 75%", porcentaje: 75 },
-            { nombre: "Juego Rojo", descripcion: "Completado al 30%", porcentaje: 30 }
-        ];
-    }
-    renderizarJuegos();
-
-    // Persistencia del modo oscuro
-    if (localStorage.getItem("modoOscuro") === "true") {
-        document.documentElement.classList.add("dark");
-    } else {
-        document.documentElement.classList.remove("dark");
+    const buscador = document.getElementById("buscador-juegos");
+    if (buscador) {
+        buscador.addEventListener("input", function(e) {
+            filtroBusqueda = e.target.value;
+            renderizarJuegos();
+        });
     }
 
+    // Modo oscuro
+    // Eliminar persistencia local de modo oscuro
     const botonDark = document.getElementById("darkModeToggle");
     if (botonDark) {
         botonDark.addEventListener("click", () => {
             document.documentElement.classList.toggle("dark");
-            localStorage.setItem("modoOscuro", document.documentElement.classList.contains("dark"));
         });
     }
+
+    // ✅ Solicita usuario solo una vez y luego carga los juegos
+    solicitarUsuarioAlInicio(cargarJuegos);
 });
