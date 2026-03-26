@@ -1,4 +1,6 @@
 # app-web-videogames
+Hacer una app web para organizar el porcentaje de trofeos de los videojuegos
+
 # 🎮 GameTracker Pro: Tu Odisea Gamer bajo Control
 
 **GameTracker** es una plataforma web diseñada para entusiastas de los videojuegos que buscan transformar su "backlog" infinito en una lista de conquistas. Centraliza tu progreso, gestiona tus horas de juego y celebra tus logros en una sola interfaz intuitiva.
