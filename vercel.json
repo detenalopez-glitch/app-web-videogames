@@ -4,6 +4,13 @@
         {
             "src": "server/index.js",
             "use": "@vercel/node"
+        },
+        {
+            "src": "package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "."
+            }
         }
     ],
     "routes": [
@@ -12,20 +19,8 @@
             "dest": "/server/index.js"
         },
         {
-            "src": "/app.js",
-            "dest": "/app.js"
-        },
-        {
-            "src": "/styles.css",
-            "dest": "/styles.css"
-        },
-        {
-            "src": "/tailwind.css",
-            "dest": "/tailwind.css"
-        },
-        {
-            "src": "/src/(.*)",
-            "dest": "/src/$1"
+            "src": "/(.*\\.(js|css|html|png|jpg|svg|ico))",
+            "dest": "/$1"
         },
         {
             "src": "/(.*)",

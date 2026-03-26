@@ -3,7 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "build:css": "npx tailwindcss -i ./tailwind.css -o ./styles.css --watch"
+    "build:css": "npx tailwindcss -i ./tailwind.css -o ./styles.css",
+    "build": "npx tailwindcss -i ./tailwind.css -o ./styles.css"
   },
   "devDependencies": {
     "tailwindcss": "^3.0.0",
