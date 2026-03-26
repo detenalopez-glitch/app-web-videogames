@@ -42,9 +42,9 @@ const crearTarea = (data) => {
   const nuevaTarea = {
     id: idCounter++,
     titulo: data.titulo,
-    progreso: data.progreso || 0
+    progreso: data.progreso || 0,
+    descripcion: data.descripcion || ""
   };
-
   tasks.push(nuevaTarea);
   guardarEnDisco();
   return nuevaTarea;

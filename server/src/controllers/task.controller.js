@@ -43,7 +43,7 @@ const eliminarTarea = (req, res, next) => {
 
   try {
     taskService.eliminarTarea(id);
-    res.status(204).send();
+    res.json({ success: true });
   } catch (error) {
     next(error); // 🔥 clave
   }

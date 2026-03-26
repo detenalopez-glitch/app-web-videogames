@@ -12,10 +12,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Servir archivos estáticos del frontend
-app.use(express.static(path.join(__dirname, '../'))); // ← corregido pp → app
+// Registrar rutas de la API
+app.use('/tasks', taskRoutes);
 
-// Rutas de la API
+// Servir archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, '../')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../index.html'));
