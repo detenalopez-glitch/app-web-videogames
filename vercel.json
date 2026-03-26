@@ -12,6 +12,22 @@
             "dest": "/server/index.js"
         },
         {
+            "src": "/app.js",
+            "dest": "/app.js"
+        },
+        {
+            "src": "/styles.css",
+            "dest": "/styles.css"
+        },
+        {
+            "src": "/tailwind.css",
+            "dest": "/tailwind.css"
+        },
+        {
+            "src": "/src/(.*)",
+            "dest": "/src/$1"
+        },
+        {
             "src": "/(.*)",
             "dest": "/server/index.js"
         }
