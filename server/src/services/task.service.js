@@ -23,9 +23,14 @@ function cargarDesdeDisco() {
 }
 
 function guardarEnDisco() {
-    const dir = path.dirname(DATA_FILE);
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(DATA_FILE, JSON.stringify(tasks, null, 2), "utf-8");
+    try {
+        const dir = path.dirname(DATA_FILE);
+        fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(DATA_FILE, JSON.stringify(tasks, null, 2), "utf-8");
+    } catch (err) {
+        // En Vercel el filesystem es de solo lectura, los datos solo persisten en memoria
+        console.warn("No se pudo guardar en disco:", err.message);
+    }
 }
 
 cargarDesdeDisco();
